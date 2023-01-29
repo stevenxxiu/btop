@@ -218,6 +218,7 @@ namespace Config {
 		{"proc_filter", ""},
 		{"proc_command", ""},
 		{"selected_name", ""},
+		{"selected_cmd", ""},
 	};
 	unordered_flat_map<string, string> stringsTmp;
 
@@ -482,6 +483,7 @@ namespace Config {
 			if (Proc::shown) {
 				ints.at("selected_pid") = Proc::selected_pid;
 				strings.at("selected_name") = Proc::selected_name;
+				strings.at("selected_cmd") = Proc::selected_cmd;
 				ints.at("proc_start") = Proc::start;
 				ints.at("proc_selected") = Proc::selected;
 				ints.at("selected_depth") = Proc::selected_depth;

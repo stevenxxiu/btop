@@ -22,6 +22,8 @@ tab-size = 4
 #include <thread>
 #include <mutex>
 
+#include <clip.h>
+
 #include <btop_input.hpp>
 #include <btop_tools.hpp>
 #include <btop_config.hpp>
@@ -436,6 +438,10 @@ namespace Input {
 						return;
 					else if (old_selected != new_selected and (old_selected == 0 or new_selected == 0))
 						redraw = true;
+				}
+				else if (key == "x") {
+					atomic_wait(Runner::active);
+					clip::set_text(Config::getS("selected_cmd"));
 				}
 				else keep_going = true;
 

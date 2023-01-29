@@ -147,6 +147,13 @@ else
 	LTO := $(THREADS)
 endif
 
+#? Pull in the clipboard library
+CLIPDIR		:= lib/clip
+override ADDFLAGS += -L$(CLIPDIR) -lclip
+ifeq ($(PLATFORM_LC),linux)
+	override ADDFLAGS += -lxcb
+endif
+
 #? The Directories, Source, Includes, Objects and Binary
 SRCDIR		:= src
 INCDIRS		:= include $(wildcard lib/**/include)
@@ -166,7 +173,7 @@ OPTFLAGS			:= -O2 -ftree-vectorize -flto=$(LTO)
 LDCXXFLAGS			:= -pthread -D_FORTIFY_SOURCE=2 -D_GLIBCXX_ASSERTIONS -D_FILE_OFFSET_BITS=64 $(GOODFLAGS) $(ADDFLAGS)
 override CXXFLAGS	+= $(REQFLAGS) $(LDCXXFLAGS) $(OPTFLAGS) $(WARNFLAGS)
 override LDFLAGS	+= $(LDCXXFLAGS) $(OPTFLAGS) $(WARNFLAGS)
-INC					:= $(foreach incdir,$(INCDIRS),-isystem $(incdir)) -I$(SRCDIR)
+INC					:= $(foreach incdir,$(INCDIRS),-isystem $(incdir)) -I$(CLIPDIR) -I$(SRCDIR)
 SU_USER				:= root
 
 ifdef DEBUG
@@ -199,6 +206,11 @@ P := %%
 
 #? Default Make
 all: $(PRE) directories btop
+
+clip:
+	@cd $(CLIPDIR)
+	@env CXXFLAGS="" LDFLAGS="" cmake -DCLIP_X11_WITH_PNG=OFF .
+	@env CXXFLAGS="" LDFLAGS="" make
 
 info:
 	@printf " $(BANNER)\n"
@@ -293,7 +305,7 @@ uninstall:
 
 #? Link
 .ONESHELL:
-btop: $(OBJECTS) | directories
+btop: $(OBJECTS) | directories clip
 	@sleep 0.2 2>/dev/null || true
 	@TSTAMP=$$(date +%s 2>/dev/null || echo "0")
 	@$(QUIET) || printf "\n\033[1;92mLinking and optimizing binary\033[37m...\033[0m\n"
